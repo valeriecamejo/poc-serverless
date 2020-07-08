@@ -1,0 +1,36 @@
+service: poc-serverless
+
+custom:
+  parameters:
+    tablePruebaTekpro: prueba_tekpro
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  stackTags:
+    billing_name: NN - PoC Serverless
+
+resources:
+  Resources:
+    PruebaTekpro:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: prueba_tekpro
+        AttributeDefinitions:
+          - AttributeName: product
+            AttributeType: S
+        KeySchema:
+          - AttributeName: product
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        SSESpecification:
+          SSEEnabled: true
+functions:
+  hello:
+    handler: handler.hello
+    environment:
+      tablePruebaTekpro: ${self:custom.parameters.tablePruebaTekpro}
