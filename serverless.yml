@@ -1,6 +1,7 @@
 service: poc-serverless
 
 custom:
+  currentStage: ${self:service}
   parameters:
     tablePruebaTekpro: prueba_tekpro
     bucketName: config-bucket-tekpro-01
@@ -39,5 +40,13 @@ functions:
           enabled: false
     environment:
       tablePruebaTekpro: ${self:custom.parameters.tablePruebaTekpro}
+  saveDataOnS3:
+    handler: save-data-on-s3.handler
+    environment:
       filenameDynamoData: product.json
       bucketName: ${self:custom.parameters.bucketName}
+  initProcess:
+    handler: init-process.handler
+    environment:
+      lambdaGetDynamoItem: ${self:service}-${self:provider.stage}-getDynamoItem
+      lambdaSaveDataOnS3: ${self:service}-${self:provider.stage}-saveDataOnS3
