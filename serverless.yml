@@ -3,6 +3,7 @@ service: poc-serverless
 custom:
   parameters:
     tablePruebaTekpro: prueba_tekpro
+    bucketName: config-bucket-tekpro-01
 
 provider:
   name: aws
@@ -25,12 +26,18 @@ resources:
           - AttributeName: product
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 50
+          WriteCapacityUnits: 50
         SSESpecification:
           SSEEnabled: true
 functions:
-  hello:
-    handler: handler.hello
+  getDynamoItem:
+    handler: get-dynamo-item.handler
+    events:
+      - schedule:
+          rate: cron(0/1 * ? * * *)
+          enabled: false
     environment:
       tablePruebaTekpro: ${self:custom.parameters.tablePruebaTekpro}
+      filenameDynamoData: product.json
+      bucketName: ${self:custom.parameters.bucketName}
